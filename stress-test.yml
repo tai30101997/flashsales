@@ -1,0 +1,19 @@
+config:
+  target: "http://localhost:3333"
+  phases:
+    - duration: 60
+      arrivalRate: 50
+      name: "High Intensity Test"
+  defaults:
+    headers:
+      Content-Type: "application/json"
+scenarios:
+  - name: "Flash Sale Rush"
+    flow:
+      - post:
+          url: "/api/orders/purchase"
+          json:
+            userEmail: "user-{{ $randomString(10) }}@test.com"
+            productId: "iphone-15"
+            start_time: "2026-05-01T00:00:00Z"
+            end_time: "2026-12-31T23:59:59Z"

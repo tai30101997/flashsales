@@ -1,0 +1,80 @@
+version: "3.8"
+
+services:
+  # 1. Redis
+  redis:
+    image: redis:alpine
+    container_name: media-redis
+    ports:
+      - "6379:6379"
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+        reservations:
+          memory: 128M
+
+  # 2. API
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - APP_NAME=api
+    container_name: media-api
+    ports:
+      - "3333:3333"
+    environment:
+      - REDIS_HOST=redis
+      - DB_PATH=/app/data/scraper.db
+    volumes:
+      - ./data:/app/data
+    depends_on:
+      - redis
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 1024M
+        reservations:
+          cpus: "0.5"
+          memory: 512M
+
+  # 3. Worker
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - APP_NAME=worker
+    container_name: media-worker
+    environment:
+      - REDIS_HOST=redis
+      - DB_PATH=/app/data/scraper.db
+    volumes:
+      - ./data:/app/data
+    depends_on:
+      - redis
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 1024M
+        reservations:
+          cpus: "0.5"
+          memory: 512M
+
+  # 4. Web App - Next.js frontend
+  web:
+    build:
+      context: .
+      dockerfile: apps/web-app/Dockerfile
+    container_name: media-web
+    ports:
+      - "4200:3000"
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
