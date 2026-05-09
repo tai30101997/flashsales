@@ -1,18 +1,16 @@
-import express from 'express';
-import * as path from 'path';
-import cors from 'cors';
-import { Redis } from 'ioredis';
 import { createBullBoard } from '@bull-board/api';
 import { BullMQAdapter } from '@bull-board/api/bullMQAdapter';
 import { ExpressAdapter } from '@bull-board/express';
+import cors from 'cors';
+import express from 'express';
+import * as path from 'path';
 
 import {
-  initDatabase,
   FlashSaleQueue,
+  initDatabase,
   orderRedisRepo,
 } from '@media-scra/shared';
 
-import testRouter from './modules/test/test.routes';
 import orderRouter from './modules/order/order.routes';
 
 async function initServer() {
@@ -42,7 +40,6 @@ async function initServer() {
     });
     app.set('trust proxy', 1);
     app.use('/admin/queues', serverAdapter.getRouter());
-    app.use('/api/test', testRouter);
     app.use('/api/orders', orderRouter);
 
     const server = app.listen(port, () => {
