@@ -6,7 +6,8 @@
     "start": "nx run-many -t serve -p web-app api worker --parallel=3",
     "api": "nx serve api",
     "worker": "nx serve worker",
-    "web": "nx serve web-app"
+    "web": "nx serve web-app",
+    "stress:test": "artillery run -o report.json stress-test.yml && artillery report report.json"
   },
   "private": true,
   "devDependencies": {
@@ -71,7 +72,6 @@
     "axios": "^1.13.2",
     "better-sqlite3": "^12.6.0",
     "bullmq": "^5.66.5",
-    "cheerio": "^1.1.2",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
