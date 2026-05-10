@@ -118,7 +118,7 @@ If you need to clear the state for a fresh test:
 docker compose exec redis redis-cli flushall
 
 # Reset SQLite (Delete the local db file if present)
-rm apps/api/sale.db 
+rm sale.db 
 ```
 
 ---
@@ -128,6 +128,19 @@ rm apps/api/sale.db
 All API routes are prefixed with `/api`. The API runs on `http://localhost:3333` by default.
 
 ---
+
+### `POST /api/orders/sync-cache` — Initialize Redis Product Cache
+
+Seeds (or refreshes) a product's stock into Redis so the atomic Lua script can operate on it. Must be called at least once per product before accepting orders.
+
+#### Request Body
+
+```json
+{
+  "productId": "iphone-15"
+}
+```
+
 
 ### `POST /api/orders/purchase` — Place Order
 
@@ -309,18 +322,6 @@ If no order exists:
 
 ---
 
-### `POST /api/orders/sync-cache` — Initialize Redis Product Cache
-
-Seeds (or refreshes) a product's stock into Redis so the atomic Lua script can operate on it. Must be called at least once per product before accepting orders.
-
-#### Request Body
-
-```json
-{
-  "productId": "iphone-15"
-}
-```
-
 #### Response (200)
 
 ```json
@@ -342,6 +343,9 @@ The cache is set with a **1-hour TTL (3600 seconds)**. The `bought_users` set fo
 ```
 
 ---
+
+## StressTest 
+run artillery run -o report.json stress-test.yml && artillery report report.json
 
 ## 🔄 Processing Flow (End-to-End)
 
@@ -405,3 +409,4 @@ The Bull Board dashboard provides real-time visibility into the `flash-sale` que
 
 This is automatically mounted at server startup via the Express adapter.
 ```
+S
